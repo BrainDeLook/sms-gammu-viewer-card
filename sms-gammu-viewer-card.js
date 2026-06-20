@@ -328,78 +328,13 @@ class SmsGammuViewerCard extends HTMLElement {
     });
   }
 
-  static getConfigElement() {
-    return document.createElement("sms-gammu-viewer-card-editor");
-  }
-
   static getStubConfig() {
     return { title: "SMS", max_items: 5, show_unread_only: false };
   }
 }
 
-class SmsGammuViewerCardEditor extends HTMLElement {
-  setConfig(config) {
-    this._config = config;
-    this._render();
-  }
-
-  set hass(hass) {
-    this._hass = hass;
-    const form = this.querySelector("ha-form");
-    if (form) form.hass = hass;
-  }
-
-  static get _schema() {
-    return [
-      { name: "title", selector: { text: {} } },
-      {
-        name: "max_items",
-        selector: { number: { mode: "box", min: 1, max: 20 } },
-      },
-      { name: "show_unread_only", selector: { boolean: {} } },
-    ];
-  }
-
-  _computeLabel(schema) {
-    const labels = {
-      title: "Заголовок карточки",
-      max_items: "Количество диалогов",
-      show_unread_only: "Показывать только непрочитанные",
-    };
-    return labels[schema.name] || schema.name;
-  }
-
-  _render() {
-    if (!this._config) return;
-    // ha-form — встроенный компонент HA. Он сам управляет фокусом,
-    // дебаунсом и состоянием поля ввода — никаких ручных перерисовок
-    // DOM не требуется, в отличие от самодельной формы на input'ах.
-    this.innerHTML = `<ha-form></ha-form>`;
-    const form = this.querySelector("ha-form");
-    form.hass = this._hass;
-    form.data = {
-      title: this._config.title ?? "SMS",
-      max_items: this._config.max_items ?? 5,
-      show_unread_only: this._config.show_unread_only ?? false,
-    };
-    form.schema = SmsGammuViewerCardEditor._schema;
-    form.computeLabel = this._computeLabel;
-    form.addEventListener("value-changed", (ev) => {
-      ev.stopPropagation();
-      this._config = { ...this._config, ...ev.detail.value };
-      this.dispatchEvent(
-        new CustomEvent("config-changed", {
-          detail: { config: this._config },
-          bubbles: true,
-          composed: true,
-        })
-      );
-    });
-  }
-}
 
 customElements.define("sms-gammu-viewer-card", SmsGammuViewerCard);
-customElements.define("sms-gammu-viewer-card-editor", SmsGammuViewerCardEditor);
 
 window.customCards = window.customCards || [];
 window.customCards.push({
@@ -408,6 +343,7 @@ window.customCards.push({
   description: "Shows recent SMS conversations from SMS Gammu Viewer integration",
   preview: true,
 });
+
 
 
 
