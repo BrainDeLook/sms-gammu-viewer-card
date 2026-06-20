@@ -328,13 +328,41 @@ class SmsGammuViewerCard extends HTMLElement {
     });
   }
 
+  static getConfigElement() {
+    return document.createElement("sms-gammu-viewer-card-editor");
+  }
+
   static getStubConfig() {
     return { title: "SMS", max_items: 5, show_unread_only: false };
   }
 }
 
+class SmsGammuViewerCardEditor extends HTMLElement {
+  setConfig(config) {
+    this._config = config;
+  }
+
+  set hass(hass) {
+    this._hass = hass;
+  }
+
+  connectedCallback() {
+    // Визуальный редактор сознательно не реализован — он конфликтовал
+    // с частыми обновлениями hass и сбрасывал фокус во время набора
+    // текста. Карточка настраивается через YAML, см. README.
+    this.innerHTML = `
+      <div style="padding: 16px; color: var(--secondary-text-color); font-size: 14px;">
+        Визуальный редактор не поддерживается.<br>
+        Настрой карточку через YAML — см.
+        <a href="https://github.com/BrainDeLook/sms-gammu-viewer-card#usage" target="_blank" rel="noopener">README</a>.
+      </div>
+    `;
+  }
+}
+
 
 customElements.define("sms-gammu-viewer-card", SmsGammuViewerCard);
+customElements.define("sms-gammu-viewer-card-editor", SmsGammuViewerCardEditor);
 
 window.customCards = window.customCards || [];
 window.customCards.push({
@@ -343,6 +371,7 @@ window.customCards.push({
   description: "Shows recent SMS conversations from SMS Gammu Viewer integration",
   preview: true,
 });
+
 
 
 
