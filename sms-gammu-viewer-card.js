@@ -338,32 +338,32 @@ class SmsGammuViewerCard extends HTMLElement {
 }
 
 class SmsGammuViewerCardEditor extends HTMLElement {
-  setConfig(config) {
-    this._config = config;
-    if (this._rendered) {
-      this._syncFields();
-    } else {
-      this._maybeRender();
+  set hass(hass) {
+    this._hass = hass;
+  }
+
+  connectedCallback() {
+    if (!this._rendered && this._config) {
+      this._rendered = true;
+      this._render();
     }
   }
 
-  set hass(hass) {
-    this._hass = hass;
-    this._maybeRender();
-  }
-
-  _maybeRender() {
-    // Форма рисуется один раз. hass обновляется постоянно (раз в секунду
-    // и чаще из-за системных сущностей) — полная перерисовка при каждом
-    // вызове сбрасывала бы фокус и набираемый текст в полях.
-    if (this._rendered || !this._config) return;
-    this._rendered = true;
-    this._render();
+  setConfig(config) {
+    this._config = config;
+    if (!this._rendered && this.isConnected) {
+      this._rendered = true;
+      this._render();
+    } else {
+      this._syncFields();
+    }
   }
 
   _syncFields() {
     // Обновляем значения полей не трогая DOM/фокус, если конфиг
-    // поменялся снаружи (не из нашей же формы)
+    // поменялся снаружи (не из нашей же формы), и только если поле
+    // сейчас не в фокусе (пользователь не печатает в нём прямо сейчас)
+    if (!this._config) return;
     const titleEl = this.querySelector("#title");
     const maxEl = this.querySelector("#max_items");
     const unreadEl = this.querySelector("#show_unread_only");
@@ -440,5 +440,6 @@ window.customCards.push({
   description: "Shows recent SMS conversations from SMS Gammu Viewer integration",
   preview: true,
 });
+
 
 
