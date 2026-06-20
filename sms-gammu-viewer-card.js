@@ -340,11 +340,42 @@ class SmsGammuViewerCard extends HTMLElement {
 class SmsGammuViewerCardEditor extends HTMLElement {
   setConfig(config) {
     this._config = config;
+    if (this._rendered) {
+      this._syncFields();
+    } else {
+      this._maybeRender();
+    }
   }
 
   set hass(hass) {
     this._hass = hass;
+    this._maybeRender();
+  }
+
+  _maybeRender() {
+    // Форма рисуется один раз. hass обновляется постоянно (раз в секунду
+    // и чаще из-за системных сущностей) — полная перерисовка при каждом
+    // вызове сбрасывала бы фокус и набираемый текст в полях.
+    if (this._rendered || !this._config) return;
+    this._rendered = true;
     this._render();
+  }
+
+  _syncFields() {
+    // Обновляем значения полей не трогая DOM/фокус, если конфиг
+    // поменялся снаружи (не из нашей же формы)
+    const titleEl = this.querySelector("#title");
+    const maxEl = this.querySelector("#max_items");
+    const unreadEl = this.querySelector("#show_unread_only");
+    if (titleEl && document.activeElement !== titleEl) {
+      titleEl.value = this._config.title || "SMS";
+    }
+    if (maxEl && document.activeElement !== maxEl) {
+      maxEl.value = this._config.max_items || 5;
+    }
+    if (unreadEl && document.activeElement !== unreadEl) {
+      unreadEl.checked = !!this._config.show_unread_only;
+    }
   }
 
   _render() {
@@ -409,4 +440,5 @@ window.customCards.push({
   description: "Shows recent SMS conversations from SMS Gammu Viewer integration",
   preview: true,
 });
+
 
