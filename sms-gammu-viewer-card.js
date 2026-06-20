@@ -338,95 +338,63 @@ class SmsGammuViewerCard extends HTMLElement {
 }
 
 class SmsGammuViewerCardEditor extends HTMLElement {
-  set hass(hass) {
-    this._hass = hass;
-  }
-
-  connectedCallback() {
-    if (!this._rendered && this._config) {
-      this._rendered = true;
-      this._render();
-    }
-  }
-
   setConfig(config) {
     this._config = config;
-    if (!this._rendered && this.isConnected) {
-      this._rendered = true;
-      this._render();
-    } else {
-      this._syncFields();
-    }
+    this._render();
   }
 
-  _syncFields() {
-    // Обновляем значения полей не трогая DOM/фокус, если конфиг
-    // поменялся снаружи (не из нашей же формы), и только если поле
-    // сейчас не в фокусе (пользователь не печатает в нём прямо сейчас)
-    if (!this._config) return;
-    const titleEl = this.querySelector("#title");
-    const maxEl = this.querySelector("#max_items");
-    const unreadEl = this.querySelector("#show_unread_only");
-    if (titleEl && document.activeElement !== titleEl) {
-      titleEl.value = this._config.title || "SMS";
-    }
-    if (maxEl && document.activeElement !== maxEl) {
-      maxEl.value = this._config.max_items || 5;
-    }
-    if (unreadEl && document.activeElement !== unreadEl) {
-      unreadEl.checked = !!this._config.show_unread_only;
-    }
+  set hass(hass) {
+    this._hass = hass;
+    const form = this.querySelector("ha-form");
+    if (form) form.hass = hass;
+  }
+
+  static get _schema() {
+    return [
+      { name: "title", selector: { text: {} } },
+      {
+        name: "max_items",
+        selector: { number: { mode: "box", min: 1, max: 20 } },
+      },
+      { name: "show_unread_only", selector: { boolean: {} } },
+    ];
+  }
+
+  _computeLabel(schema) {
+    const labels = {
+      title: "Заголовок карточки",
+      max_items: "Количество диалогов",
+      show_unread_only: "Показывать только непрочитанные",
+    };
+    return labels[schema.name] || schema.name;
   }
 
   _render() {
     if (!this._config) return;
-    this.innerHTML = `
-      <style>
-        .form-row { margin-bottom: 12px; }
-        label { display: block; font-size: 13px; margin-bottom: 4px; color: var(--secondary-text-color); }
-        input[type="text"], input[type="number"] {
-          width: 100%; padding: 8px; border-radius: 6px;
-          border: 1px solid var(--divider-color, #ccc);
-          background: var(--card-background-color, #fff);
-          color: var(--primary-text-color);
-          box-sizing: border-box;
-        }
-        .checkbox-row { display: flex; align-items: center; gap: 8px; }
-      </style>
-      <div class="form-row">
-        <label>Заголовок карточки</label>
-        <input type="text" id="title" value="${this._config.title || "SMS"}" />
-      </div>
-      <div class="form-row">
-        <label>Количество диалогов</label>
-        <input type="number" id="max_items" min="1" max="20" value="${this._config.max_items || 5}" />
-      </div>
-      <div class="form-row checkbox-row">
-        <input type="checkbox" id="show_unread_only" ${this._config.show_unread_only ? "checked" : ""} />
-        <label style="margin:0">Показывать только непрочитанные</label>
-      </div>
-    `;
-
-    this.querySelector("#title").addEventListener("change", (e) => {
-      this._updateConfig({ title: e.target.value });
+    // ha-form — встроенный компонент HA. Он сам управляет фокусом,
+    // дебаунсом и состоянием поля ввода — никаких ручных перерисовок
+    // DOM не требуется, в отличие от самодельной формы на input'ах.
+    this.innerHTML = `<ha-form></ha-form>`;
+    const form = this.querySelector("ha-form");
+    form.hass = this._hass;
+    form.data = {
+      title: this._config.title ?? "SMS",
+      max_items: this._config.max_items ?? 5,
+      show_unread_only: this._config.show_unread_only ?? false,
+    };
+    form.schema = SmsGammuViewerCardEditor._schema;
+    form.computeLabel = this._computeLabel;
+    form.addEventListener("value-changed", (ev) => {
+      ev.stopPropagation();
+      this._config = { ...this._config, ...ev.detail.value };
+      this.dispatchEvent(
+        new CustomEvent("config-changed", {
+          detail: { config: this._config },
+          bubbles: true,
+          composed: true,
+        })
+      );
     });
-    this.querySelector("#max_items").addEventListener("change", (e) => {
-      this._updateConfig({ max_items: parseInt(e.target.value) || 5 });
-    });
-    this.querySelector("#show_unread_only").addEventListener("change", (e) => {
-      this._updateConfig({ show_unread_only: e.target.checked });
-    });
-  }
-
-  _updateConfig(patch) {
-    this._config = { ...this._config, ...patch };
-    this.dispatchEvent(
-      new CustomEvent("config-changed", {
-        detail: { config: this._config },
-        bubbles: true,
-        composed: true,
-      })
-    );
   }
 }
 
@@ -440,6 +408,7 @@ window.customCards.push({
   description: "Shows recent SMS conversations from SMS Gammu Viewer integration",
   preview: true,
 });
+
 
 
 
