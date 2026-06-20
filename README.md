@@ -41,7 +41,7 @@ Or manually:
 
 ## Usage
 
-Add the card via the dashboard UI editor (search for "SMS Gammu Viewer Card"), or in YAML:
+> ⚠️ **YAML configuration only** — there's no visual editor for this card yet. Add it via your dashboard's **Edit → Add Card → Manual**, or directly in your dashboard YAML.
 
 ```yaml
 type: custom:sms-gammu-viewer-card
@@ -63,3 +63,4 @@ Clicking any conversation or the "Open all messages" link navigates to the full 
 ## License
 
 MIT
+
