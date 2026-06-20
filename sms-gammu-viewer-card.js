@@ -118,6 +118,11 @@ class SmsGammuViewerCard extends HTMLElement {
 
   _openPanel(number) {
     const path = this._config.panel_url || "/sms-viewer";
+    if (number) {
+      try {
+        localStorage.setItem("sms_gammu_active_number", number);
+      } catch (_) {}
+    }
     const event = new CustomEvent("location-changed", {
       bubbles: true,
       composed: true,
@@ -404,3 +409,4 @@ window.customCards.push({
   description: "Shows recent SMS conversations from SMS Gammu Viewer integration",
   preview: true,
 });
+
