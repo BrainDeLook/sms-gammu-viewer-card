@@ -1,5 +1,7 @@
 # SMS Gammu Viewer Card
 
+> ⚠️ **Архив — эта карточка теперь встроена прямо в [sms-gammu-viewer-ha](https://github.com/BrainDeLook/sms-gammu-viewer-ha), начиная с v3.1.0.** Отдельная установка больше не нужна. Если у тебя этот репозиторий добавлен в HACS — можешь удалить, просто обнови основную интеграцию, и карточка (`custom:sms-gammu-viewer-card`) появится автоматически. YAML существующего дашборда менять не нужно.
+
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 [![GitHub Release](https://img.shields.io/github/v/release/BrainDeLook/sms-gammu-viewer-card?style=for-the-badge)](https://github.com/BrainDeLook/sms-gammu-viewer-card/releases)
 [![License](https://img.shields.io/github/license/BrainDeLook/sms-gammu-viewer-card.svg?style=for-the-badge)](LICENSE)
@@ -63,4 +65,5 @@ show_unread_only: false
 ## Лицензия
 
 MIT
+
 
