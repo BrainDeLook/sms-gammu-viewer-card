@@ -1,5 +1,7 @@
 # SMS Gammu Viewer Card
 
+> ⚠️ **Archived — this card is now built directly into [sms-gammu-viewer-ha](https://github.com/BrainDeLook/sms-gammu-viewer-ha) as of v3.1.0.** No separate install needed anymore. If you have this repository added in HACS, you can remove it — update the main integration instead, and the card (`custom:sms-gammu-viewer-card`) will be available automatically. Your existing dashboard YAML doesn't need to change.
+
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 [![GitHub Release](https://img.shields.io/github/v/release/BrainDeLook/sms-gammu-viewer-card?style=for-the-badge)](https://github.com/BrainDeLook/sms-gammu-viewer-card/releases)
 [![License](https://img.shields.io/github/license/BrainDeLook/sms-gammu-viewer-card.svg?style=for-the-badge)](LICENSE)
@@ -63,4 +65,5 @@ Clicking any conversation or the "Open all messages" link navigates to the full 
 ## License
 
 MIT
+
 
